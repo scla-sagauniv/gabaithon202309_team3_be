@@ -37,9 +37,9 @@ async def update_idea(data: Idea):
         
         firebase.write_database(FIREBASE, database)
         
-        return {"result": "投稿成功"}
+        return {"result": "データが正常に受信され、処理された"}
     else:
-        return {"result": "同じ投稿があるため、投稿失敗"}
+        return {"result": "重複データが存在し、処理に失敗した"}
 
 @app.post("/generate")
 async def generate_thumbnail(data: Thumbnail):
