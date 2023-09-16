@@ -14,7 +14,6 @@ class Idea(BaseModel):
     description: str | None = None
     category: str | None = None
     thumbnail: str | None = None
-    update: bool
     
 class Thumbnail(BaseModel):
     name: str
@@ -22,7 +21,7 @@ class Thumbnail(BaseModel):
 
 app = FastAPI()
 app.add_middleware(CORSMiddleware,
-                   allow_origins=["http://localhost:8080"],
+                   allow_origins=["http://localhost:5173"],
                    allow_credentials=True,
                    allow_methods=["*"],
                    allow_headers=["*"])
@@ -35,11 +34,11 @@ async def get_database():
 async def update_idea(data: Idea):
     database = firebase.get_database(FIREBASE)
     
-    if data.name not in [idea["name"] for idea in database] and data.update:
+    if data.name not in [idea["name"] for idea in database]:
         ids = [int(idea["id"]) for idea in database]
         ids.sort()
         id = [id for id in list(range(1, ids[-1] + 2)) if id not in [int(idea["id"]) for idea in database]][0]
-        database.append({"id": id, "name": data.name, "description": data.description, "category": data.category, "thumbnail": data.thumbnail})
+        database.append({"id": str(id), "name": data.name, "description": data.description, "category": data.category, "thumbnail": data.thumbnail})
         
         firebase.write_database(FIREBASE, database)
         
@@ -52,13 +51,13 @@ async def generate_thumbnail(data: Thumbnail):
     payload = json.dumps({"key": f"{API_KEY}",
                           "prompt": f"{data.name}, {data.description}",
                           "negative_prompt": None,
-                          "width": "400",
-                          "height": "400",
+                          "width": "248",
+                          "height": "248",
                           "samples": "1",
                           "num_inference_steps": "20",
                           "seed": None,
                           "guidance_scale": 10,
-                          "safety_checker": "yes",
+                          "safety_checker": "no",
                           "multi_lingual": "yes",
                           "panorama": "no",
                           "self_attention": "no",
@@ -70,6 +69,7 @@ async def generate_thumbnail(data: Thumbnail):
     url = "https://stablediffusionapi.com/api/v3/text2img"
     headers = {"Content-Type": "application/json"}
     response = requests.request("POST", url, headers=headers, data=payload)
-    thumbnail_url = response.json()["output"][0]
+    thumbnail = response.json()
+    thumbnail_url = thumbnail["output"]
 
     return {"url": thumbnail_url}

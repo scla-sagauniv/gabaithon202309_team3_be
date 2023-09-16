@@ -12,12 +12,12 @@ git clone https://github.com/scla-sagauniv/gabaithon202309_team3_be.git backend
     ```
     pip install pipenv
     pipenv --python 3.10
-    pipenv install -r requirements.txt
+    pipenv install fastapi uvicorn firebase-admin
     pipenv shell
     ```
 - 通常の場合
     ```
-    pip install -r requirements.txt
+    pip install fastapi uvicorn firebase-admin
     ```
 
 Firebase認証情報を設定する
@@ -28,24 +28,7 @@ Firebase認証情報を設定する
 
 APIを起動する
 ```
-cd backend
 uvicorn main:app --reload
 
-# http://127.0.0.1:8000/database で確認する
-```
-
-# Dockerでの環境構築
-
-レポジトリーをクーロンする
-
-```
-git clone https://github.com/scla-sagauniv/gabaithon202309_team3_be.git backend
-```
-
-Dockerでビルドし、APIを起動する
-```
-cd backend
-docker build . -t backend
-docker network create gabaithon
-docker run -d --name backend --rm --network gabaithon -p 8000:8000 backend
+# http://127.0.0.1:5000/test で確認する
 ```
